@@ -1,0 +1,80 @@
+import Data.Char (toUpper)
+import Data.List (genericLength)
+
+-- 1) Aplicar descuento e IVA
+aplicarDescuento :: Double -> Double -> Double
+aplicarDescuento precio descuento = precio * (1 - descuento / 100)
+
+aplicarIVA :: Double -> Double -> Double
+aplicarIVA precio iva = precio * (1 + iva / 100)
+
+calcularCesta :: [(Double, Double)] -> (Double -> Double -> Double) -> Double
+calcularCesta cesta funcion = sum [funcion precio porcentaje | (precio, porcentaje) <- cesta]
+
+-- 2) Aplicar función a cada elemento de una lista
+aplicarALista :: (a -> b) -> [a] -> [b]
+aplicarALista f lista = map f lista
+
+-- 3) Contar palabras y su longitud
+contarPalabras :: String -> [(String, Int)]
+contarPalabras frase = [(palabra, length palabra) | palabra <- words frase]
+
+-- 4) Convertir notas en calificaciones
+asignarCalificacion :: Double -> String
+asignarCalificacion nota
+  | nota >= 95 = "Excelente"
+  | nota >= 85 = "Notable"
+  | nota >= 75 = "Bueno"
+  | nota >= 70 = "Suficiente"
+  | otherwise  = "Desempeño insuficiente"
+
+procesarNotas :: [(String, Double)] -> [(String, String)]
+procesarNotas notas = [(map toUpper asignatura, asignarCalificacion nota) | (asignatura, nota) <- notas]
+
+-- 5) Calcular módulo de un vector
+moduloVector :: [Double] -> Double
+moduloVector v = sqrt (sum [x^2 | x <- v])
+
+-- 6) Detectar valores atípicos
+media :: [Double] -> Double
+media xs = sum xs / genericLength xs
+
+desviacionEstandar :: [Double] -> Double
+desviacionEstandar xs = sqrt (sum [(x - m)^2 | x <- xs] / genericLength xs)
+  where m = media xs
+
+valoresAtipicos :: [Double] -> [Double]
+valoresAtipicos xs = [x | x <- xs, let z = (x - m) / d, z > 3 || z < -3]
+  where 
+    m = media xs
+    d = desviacionEstandar xs
+
+-- MAIN
+main :: IO ()
+main = do
+    putStrLn "Pruebas de las funciones en Haskell:"
+    
+    -- Prueba de aplicarDescuento y aplicarIVA
+    print $ aplicarDescuento 100 10  -- Esperado: 90.0
+    print $ aplicarIVA 100 16        -- Esperado: 116.0
+
+    -- Prueba de calcularCesta
+    let cesta = [(100, 10), (200, 15), (50, 5)]
+    print $ calcularCesta cesta aplicarDescuento -- Aplica descuentos 
+
+    -- Prueba de aplicarALista
+    print $ aplicarALista (*2) [1,2,3,4] -- Esperado: [2,4,6,8]
+
+    -- Prueba de contarPalabras
+    print $ contarPalabras "Hola mundo esto es Haskell"
+
+    -- Prueba de procesarNotas
+    let notas = [("matematicas", 96), ("historia", 80), ("ingles", 72)]
+    print $ procesarNotas notas
+
+    -- Prueba de moduloVector
+    print $ moduloVector [3, 4] -- Esperado: 5.0 
+
+    -- Prueba de valoresAtipicos
+    let muestra = [10, 12, 15, 14, 13, 90] -- 90 es un valor atípico
+    print $ valoresAtipicos muestra
